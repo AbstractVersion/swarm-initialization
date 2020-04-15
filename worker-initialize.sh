@@ -137,7 +137,9 @@ docker volume rm test-nfs-volume
 # docker run --rm -it  -v test-nfs-volume:/app/test-data private.registry.io/test-nfs:latest
 
 
-sudo mkdir -p /nfs/micor-env/config/{filebeat,logstash}
+sudo mkdir -p /nfs/micor-env/config/filebeat
+# sudo mkdir -p /nfs/micor-env/config/logstash
+
 # On Workers
 sudo -u root mount $nfs_ip:/filebeat-conf /nfs/micor-env/config/filebeat
 
