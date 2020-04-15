@@ -46,7 +46,7 @@ read -p "Do you want to install docker compose ? (y/n) " RESP
 echo "---------------------------------- Swarm Worker Initialization -------------------------------------------------"
 
 
-echo "please run the command [ docker swarm join-token worker ] on your leader or a manager to retrieve the token the ip & the port\n"
+echo "please run the command [ docker swarm join-token manager ] on your leader or a manager to retrieve the token the ip & the port\n"
 
 read -p "Please provide the swarn token & press enter: " swarm_token
 read -p "Please provide the swarn leader ip & press enter: " swarm_leader_ip
@@ -54,7 +54,7 @@ read -p "Please provide the swarn api port & press enter: " swarm_leader_port
 
 echo '\n'
 
-echo "Registering node as worker on the swarm clustr, the node will be marked as host : "$HOSTNAME
+echo "Registering node as manager on the swarm clustr, the node will be marked as host : "$HOSTNAME
 docker swarm join \
     --token $swarm_token \
     $swarm_leader_ip:$swarm_leader_port
@@ -126,20 +126,20 @@ read -p "Please provide NFS server ip address :     " nfs_ip
 IP=$nfs_ip
 
 # Hostname to add/remove.
-HOSTNAME='nfs.server.io'
-HOSTS_LINE="$IP\t$HOSTNAME"
-if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+HOSTNAME_NFS='nfs.server.io'
+HOSTS_LINE="$IP\t$HOSTNAME_NFS"
+if [ -n "$(grep $HOSTNAME_NFS /etc/hosts)" ]
     then
-        echo "$HOSTNAME already exists : $(grep $HOSTNAME $ETC_HOSTS)"
+        echo "$HOSTNAME_NFS already exists : $(grep $HOSTNAME_NFS $ETC_HOSTS)"
     else
-        echo "Adding $HOSTNAME to your $ETC_HOSTS";
+        echo "Adding $HOSTNAME_NFS to your $ETC_HOSTS";
         sudo -- sh -c -e "echo '$HOSTS_LINE' >> /etc/hosts";
 
-        if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+        if [ -n "$(grep $HOSTNAME_NFS /etc/hosts)" ]
             then
-                echo "$HOSTNAME was added succesfully \n $(grep $HOSTNAME /etc/hosts)";
+                echo "$HOSTNAME_NFS was added succesfully \n $(grep $HOSTNAME_NFS /etc/hosts)";
             else
-                echo "Failed to Add $HOSTNAME, Try again!";
+                echo "Failed to Add $HOSTNAME_NFS, Try again!";
         fi
 fi
 
@@ -154,20 +154,20 @@ sudo -u root service docker-volume-netshare start
 sudo systemctl enable docker-volume-netshare
 
 echo 'testing nfs docker volume driver....'
-docker volume create --driver nfs --name test-nfs-volume -o share=$HOSTNAME:/filebeat
+docker volume create --driver nfs --name test-nfs-volume -o share=$HOSTNAME_NFS:/filebeat
 docker volume inspect test-nfs-volume
 docker volume rm test-nfs-volume
 # docker run --rm -it  -v test-nfs-volume:/app/test-data private.registry.io/test-nfs:latest
 
 
-sudo mkdir -p /nfs/micor-env/config/filebeat
-# sudo mkdir -p /nfs/micor-env/config/logstash
+# sudo mkdir -p /nfs/micor-env/config/filebeat
+sudo mkdir -p /nfs/micor-env/config/logstash
 
 # On Workers
-sudo -u root mount -t nfs $HOSTNAME:/filebeat-conf /nfs/micor-env/config/filebeat
+# sudo -u root mount -t nfs $HOSTNAME:/filebeat-conf /nfs/micor-env/config/filebeat
 # sudo -u root mount 192.168.2.4:/filebeat-conf /nfs/micor-env/config/filebeat
 
-# sudo -u root mount -t nfs $HOSTNAME:/filebeat-conf /nfs/micor-env/config/filebeat
+sudo -u root mount -t nfs $HOSTNAME_NFS:/logstash-conf/ /nfs/micor-env/config/logstash
 
 
 
