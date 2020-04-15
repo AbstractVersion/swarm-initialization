@@ -92,7 +92,7 @@ if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
         fi
 fi
 
-sudo apt-get install http -y
+snap install http
 # Now create a new directory for docker certificate and copy the Root CA certificate into it.
 sudo mkdir -p /etc/docker/certs.d/private.registry.io/
 sudo cp depentencies/certificate/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
