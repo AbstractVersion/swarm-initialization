@@ -59,13 +59,13 @@ docker swarm join \
     --token $swarm_token \
     $swarm_leader_ip:$swarm_leader_port
 
-echo "----------------- Inserting private image repository's certificate on trasted crts ---------------------------\n"
-echo "make sure you have the correct crt file placed in : docker-registry/nginx/ssl/private-registry-cert.crt\n"   
+echo "----------------- Inserting private image repository's certificate on trasted crts --------------------------- \n"
+echo "make sure you have the correct crt file placed in : docker-registry/nginx/ssl/private-registry-cert.crt  \n"   
 echo "make sure to select the extra/private-registry-cert.crt from the trusted list, this will be the certificate of your repository which poits to the private key that serves TLS"
 
  # PATH TO YOUR HOSTS FILE
 ETC_HOSTS=/etc/hosts
-read -p "Enter registry IP address:\t"  registry_ip
+read -p "Enter registry IP address: \t"  registry_ip
 
     # sudo su
     # echo $registry_ip'    private.registry.io' >> /etc/hosts
@@ -95,11 +95,11 @@ fi
 
 # Now create a new directory for docker certificate and copy the Root CA certificate into it.
 sudo mkdir -p /etc/docker/certs.d/private.registry.io/
-sudo cp ../depentencies/certificate/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
+sudo cp ../../depentencies/certificate/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
 
 # And then create a new directory '/usr/share/ca-certificate/extra' and copy the Root CA certificate into it.
 sudo mkdir -p /usr/share/ca-certificates/extra/
-sudo cp ../depentencies/certificate/private-registry-cert.crt /usr/share/ca-certificates/extra/
+sudo cp ../../depentencies/certificate/private-registry-cert.crt /usr/share/ca-certificates/extra/
 
 # Update certificates & restart docker
 sudo dpkg-reconfigure ca-certificates
@@ -108,7 +108,7 @@ sudo systemctl restart docker
 
 echo "testing repository..."
 
-read -p "Please provide the repository user the default credentials are {abstract:admin}:\t" repo_user
+read -p "Please provide the repository user the default credentials are {abstract:admin}:   " repo_user
 
 http -a $repo_user https://private.registry.io/v2/_catalog
 
@@ -121,7 +121,7 @@ echo "------------------------------------ Configuring NFS share volume --------
 
 sudo -u root apt install nfs-common -y
 
-read -p "Please provide NFS server ip address :\t" nfs_ip
+read -p "Please provide NFS server ip address :     " nfs_ip
 
 # Install theese external tool for volume share among managers
 # Install Netshare Docker Volume Driver
