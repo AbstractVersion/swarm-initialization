@@ -123,15 +123,38 @@ sudo -u root apt install nfs-common -y
 
 read -p "Please provide NFS server ip address :     " nfs_ip
 
+IP=$nfs_ip
+
+# Hostname to add/remove.
+HOSTNAME='nfs.server.io'
+HOSTS_LINE="$IP\t$HOSTNAME"
+if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+    then
+        echo "$HOSTNAME already exists : $(grep $HOSTNAME $ETC_HOSTS)"
+    else
+        echo "Adding $HOSTNAME to your $ETC_HOSTS";
+        sudo -- sh -c -e "echo '$HOSTS_LINE' >> /etc/hosts";
+
+        if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+            then
+                echo "$HOSTNAME was added succesfully \n $(grep $HOSTNAME /etc/hosts)";
+            else
+                echo "Failed to Add $HOSTNAME, Try again!";
+        fi
+fi
+
+
+
 # Install theese external tool for volume share among managers
 # Install Netshare Docker Volume Driver
 # Install Netshare which will provide the NFS Docker Volume Driver:
 wget https://github.com/ContainX/docker-volume-netshare/releases/download/v0.36/docker-volume-netshare_0.36_amd64.deb
 sudo -u root dpkg -i docker-volume-netshare_0.36_amd64.deb
 sudo -u root service docker-volume-netshare start
+sudo systemctl enable docker-volume-netshare
 
 echo 'testing nfs docker volume driver....'
-docker volume create --driver nfs --name test-nfs-volume -o share=$nfs_ip:/filebeat
+docker volume create --driver nfs --name test-nfs-volume -o share=$HOSTNAME:/filebeat
 docker volume inspect test-nfs-volume
 docker volume rm test-nfs-volume
 # docker run --rm -it  -v test-nfs-volume:/app/test-data private.registry.io/test-nfs:latest
@@ -141,7 +164,10 @@ sudo mkdir -p /nfs/micor-env/config/filebeat
 # sudo mkdir -p /nfs/micor-env/config/logstash
 
 # On Workers
-sudo -u root mount $nfs_ip:/filebeat-conf /nfs/micor-env/config/filebeat
+sudo -u root mount -t nfs $HOSTNAME:/filebeat-conf /nfs/micor-env/config/filebeat
+# sudo -u root mount 192.168.2.4:/filebeat-conf /nfs/micor-env/config/filebeat
+
+# sudo -u root mount -t nfs $HOSTNAME:/filebeat-conf /nfs/micor-env/config/filebeat
 
 
 
