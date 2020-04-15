@@ -95,11 +95,11 @@ fi
 
 # Now create a new directory for docker certificate and copy the Root CA certificate into it.
 sudo mkdir -p /etc/docker/certs.d/private.registry.io/
-sudo cp ../../depentencies/certificate/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
+sudo cp depentencies/certificate/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
 
 # And then create a new directory '/usr/share/ca-certificate/extra' and copy the Root CA certificate into it.
 sudo mkdir -p /usr/share/ca-certificates/extra/
-sudo cp ../../depentencies/certificate/private-registry-cert.crt /usr/share/ca-certificates/extra/
+sudo cp depentencies/certificate/private-registry-cert.crt /usr/share/ca-certificates/extra/
 
 # Update certificates & restart docker
 sudo dpkg-reconfigure ca-certificates
@@ -131,7 +131,7 @@ sudo -u root dpkg -i docker-volume-netshare_0.36_amd64.deb
 sudo -u root service docker-volume-netshare start
 
 echo 'testing nfs docker volume driver....'
-docker volume create --driver nfs --name test-nfs-volume -o share=$nfs_ip:/hi
+docker volume create --driver nfs --name test-nfs-volume -o share=$nfs_ip:/filebeat
 docker volume inspect test-nfs-volume
 docker volume rm test-nfs-volume
 # docker run --rm -it  -v test-nfs-volume:/app/test-data private.registry.io/test-nfs:latest
