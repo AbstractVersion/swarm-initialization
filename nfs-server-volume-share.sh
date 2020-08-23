@@ -31,7 +31,7 @@ docker run -itd --name nfs-swarm \
   --network=host \
   -v /nfs-swarm-share/:/nfs.1 \
   -e SHARED_DIRECTORY=/nfs.1 \
-  -p $nfs_ip:2049 \
+  -p $nfs_ip:2049:2049 \
   itsthenetwork/nfs-server-alpine:latest
 
 
