@@ -92,7 +92,6 @@ if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
         fi
 fi
 
-snap install http
 # Now create a new directory for docker certificate and copy the Root CA certificate into it.
 sudo mkdir -p /etc/docker/certs.d/private.registry.io/
 sudo cp depentencies/certificate/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
@@ -110,7 +109,7 @@ echo "testing repository..."
 
 read -p "Please provide the repository user the default credentials are {abstract:admin}:   " repo_user
 
-http -a $repo_user https://private.registry.io/v2/_catalog
+curl https://private.registry.io/v2/_catalog
 
 docker image pull alpine:latest
 docker image tag alpine:latest private.registry.io/test-alpine:latest
@@ -126,7 +125,7 @@ read -p "Please provide NFS server ip address :     " nfs_ip
 IP=$nfs_ip
 
 # Hostname to add/remove.
-HOSTNAME_NFS='nfs.server.io'
+HOSTNAME_NFS='swarmNfs.server.io'
 HOSTS_LINE="$IP\t$HOSTNAME_NFS"
 if [ -n "$(grep $HOSTNAME_NFS /etc/hosts)" ]
     then

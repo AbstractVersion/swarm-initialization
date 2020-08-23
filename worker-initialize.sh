@@ -126,7 +126,7 @@ read -p "Please provide NFS server ip address :     " nfs_ip
 IP=$nfs_ip
 
 # Hostname to add/remove.
-HOSTNAME='nfs.server.io'
+HOSTNAME='swarmNfs.server.io'
 HOSTS_LINE="$IP\t$HOSTNAME"
 if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
     then
