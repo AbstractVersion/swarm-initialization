@@ -14,7 +14,7 @@ sudo -u root apt install  nfs-utils -y
 # or we can setup a NFS Server using Docker (explained below):
 
 # Prepare the NFS Home Directory:
-sudo -u root mkdir /nfs-swarm-share
+sudo -u root cp ./mnt /
 
 read -p "Please provide the ip address of the host machine that the NFS server will be isntalled : \t"  nfs_ip
 
@@ -29,7 +29,7 @@ docker run -itd --name nfs-swarm \
   --restart unless-stopped \
   --privileged \
   --network=host \
-  -v /nfs-swarm-share/:/nfs.1 \
+  -v /mnt/local-nfs:/nfs.1 \
   -e SHARED_DIRECTORY=/nfs.1 \
   -p $nfs_ip:2049:2049 \
   itsthenetwork/nfs-server-alpine:latest
