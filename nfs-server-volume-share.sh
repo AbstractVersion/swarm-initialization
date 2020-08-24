@@ -15,7 +15,10 @@ sudo -u root apt install  nfs-utils -y
 
 # Prepare the NFS Home Directory:
 sudo -u root cp -r ./mnt /
-
+sudo -u root mkdir /mnt/local-nfs/elastic-dev-volume
+sudo -u root mkdir /mnt/local-nfs/elastic-volume
+sudo -u root mkdir /mnt/local-nfs/mysql-config
+sudo -u root mkdir /mnt/local-nfs/mysql-dev
 read -p "Please provide the ip address of the host machine that the NFS server will be isntalled : \t"  nfs_ip
 
     # sudo su
@@ -33,5 +36,6 @@ docker run -itd --name nfs-swarm \
   -e SHARED_DIRECTORY=/nfs.1 \
   -p $nfs_ip:2049:2049 \
   itsthenetwork/nfs-server-alpine:latest
+
 
 

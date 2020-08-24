@@ -18,7 +18,6 @@ filebeat.autodiscover:
                       fields: ["message"]
                       target: ""
                       overwrite_keys: true
-  
   output.logstash:
     hosts: "logstash:5044"
   

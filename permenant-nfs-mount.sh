@@ -5,13 +5,15 @@
 # Use the following procedure to automatically mount an NFS share on Linux systems:
 
 
+# Managers
 # Set up a mount point for the remote NFS share:
 su -
 
 mkdir /nfs/micor-env/config/logstash/
 echo 'swarmNfs.server.io:/logstash-conf /nfs/micor-env/config/logstash/  nfs      defaults    0       0' >> /etc/fstab
 
+# Workers
 # su -
 
 # mkdir /nfs/micor-env/config/logstash/
-# echo 'swarmNfs.server.io:/logstash-conf /nfs/micor-env/config/logstash/  nfs      defaults    0       0' >> /etc/fstab
+# echo 'swarmNfs.server.io:/filebeat-conf /nfs/micor-env/config/filebeat/  nfs      defaults    0       0' >> /etc/fstab
