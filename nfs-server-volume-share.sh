@@ -19,6 +19,7 @@ sudo -u root mkdir /mnt/local-nfs/elastic-dev-volume
 sudo -u root mkdir /mnt/local-nfs/elastic-volume
 sudo -u root mkdir /mnt/local-nfs/mysql-config
 sudo -u root mkdir /mnt/local-nfs/mysql-dev
+sudo -u root mkdir /mnt/local-nfs/mongo-db
 read -p "Please provide the ip address of the host machine that the NFS server will be isntalled : \t"  nfs_ip
 
     # sudo su
