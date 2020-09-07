@@ -160,14 +160,15 @@ docker volume rm test-nfs-volume
 # docker run --rm -it  -v test-nfs-volume:/app/test-data private.registry.io/test-nfs:latest
 
 
-sudo mkdir -p /nfs/micor-env/config/filebeat
+sudo mkdir -p /mnt/local-nfs/filebeat/
 # sudo mkdir -p /nfs/micor-env/config/logstash
 
 # On Workers
-sudo -u root mount -t nfs $HOSTNAME:/filebeat-conf /nfs/micor-env/config/filebeat
+echo 'swarmNfs.server.io:/filebeat-conf /mnt/local-nfs/filebeat/  nfs      defaults    0       0' >> /etc/fstab
 # sudo -u root mount 192.168.2.4:/filebeat-conf /nfs/micor-env/config/filebeat
 
 # sudo -u root mount -t nfs $HOSTNAME:/filebeat-conf /nfs/micor-env/config/filebeat
+sudo mount /mnt/local-nfs/filebeat/
 
 
 

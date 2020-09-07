@@ -18,8 +18,10 @@ sudo -u root cp -r ./mnt /
 sudo -u root mkdir /mnt/local-nfs/elastic-dev-volume
 sudo -u root mkdir /mnt/local-nfs/elastic-volume
 sudo -u root mkdir /mnt/local-nfs/mysql-config
-sudo -u root mkdir /mnt/local-nfs/mysql-dev
+sudo -u root mkdir /mnt/local-nfs/mysql/session
 sudo -u root mkdir /mnt/local-nfs/mongo-db
+# sudo -u root cp ./nginx-proxy/ /mnt/local-nfs/nginx-proxy
+
 read -p "Please provide the ip address of the host machine that the NFS server will be isntalled : \t"  nfs_ip
 
     # sudo su

@@ -9,11 +9,11 @@
 # Set up a mount point for the remote NFS share:
 su -
 
-mkdir /nfs/micor-env/config/logstash/
-echo 'swarmNfs.server.io:/logstash-conf /nfs/micor-env/config/logstash/  nfs      defaults    0       0' >> /etc/fstab
+mkdir -p /mnt/local-nfs/logstash-conf
+echo 'swarmNfs.server.io:/logstash-conf /mnt/local-nfs/logstash-conf  nfs      defaults    0       0' >> /etc/fstab
 
 # Workers
 # su -
 
-# mkdir /nfs/micor-env/config/logstash/
-# echo 'swarmNfs.server.io:/filebeat-conf /nfs/micor-env/config/filebeat/  nfs      defaults    0       0' >> /etc/fstab
+# sudo mkdir -p /mnt/local-nfs/filebeat/
+# echo 'swarmNfs.server.io:/filebeat-conf /mnt/local-nfs/filebeat/  nfs      defaults    0       0' >> /etc/fstab
