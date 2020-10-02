@@ -172,7 +172,3 @@ else
     echo "Ok then proceding."
 fi
 
-
-
-
-sudo -u root mount swarmNfs.server.io:/nginx-conf test
