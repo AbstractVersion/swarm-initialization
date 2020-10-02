@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+    nfs-server:
+        image: itsthenetwork/nfs-server-alpine:latest
+        restart: unless-stopped
+        network_mode: "host"
+        privileged: true
+        ports:
+            - "2049:2049" 
+        volumes:
+            - nfsData:/nfs.1
+        environment:
+            - SHARED_DIRECTORY=/nfs.1
+
+#Volumes
+volumes:
+    nfsData:
+      driver: local
+      driver_opts:
+        type: 'none'
+        o: 'bind'
+        device: ${CURR_DIR}/mnt/local-nfs/
