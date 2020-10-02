@@ -1,7 +1,8 @@
 #!/bin/sh
 # initialize nfs-server
-echo 'installing git...'
-sudo -u root apt-get install git -y 
+echo 'installing depentencies...'
+sudo -u root apt-get install git -y -qq
+sudo -u root apt-get install curl -y -qq
 
 echo 'Checking docker installation...'
 if [ "$(which docker)" ]; then
@@ -37,5 +38,36 @@ else
     fi
 fi
 
-echo 'all set ! firing up nfs server !'
+IP=127.0.0.1
+# Hostname to add/remove.
+HOSTNAME='private.registry.io interface.registry.io'
+HOSTS_LINE="$IP\t$HOSTNAME"
+if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+    then
+        echo "$HOSTNAME already exists : $(grep $HOSTNAME $ETC_HOSTS)"
+    else
+        echo "Adding $HOSTNAME to your $ETC_HOSTS";
+        sudo -- sh -c -e "echo '$HOSTS_LINE' >> /etc/hosts";
+
+        if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+            then
+                echo "$HOSTNAME was added succesfully \n $(grep $HOSTNAME /etc/hosts)";
+            else
+                echo "Failed to Add $HOSTNAME, Try again!";
+        fi
+fi
+
+# Now create a new directory for docker certificate and copy the Root CA certificate into it.
+sudo mkdir -p /etc/docker/certs.d/private.registry.io/
+sudo cp ../depentencies/certificate/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
+
+# And then create a new directory '/usr/share/ca-certificate/extra' and copy the Root CA certificate into it.
+sudo mkdir -p /usr/share/ca-certificates/extra/
+sudo cp ../depentencies/certificate/private-registry-cert.crt /usr/share/ca-certificates/extra/
+
+# Update certificates & restart docker
+sudo dpkg-reconfigure ca-certificates
+sudo systemctl restart docker
+
+echo 'all set ! firing up docker-registry with under dns private.registry.io, make sure all your hosts file point to this dns !'
 docker-compose up -d
