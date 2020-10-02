@@ -1,7 +1,5 @@
 #!/bin/sh
 # initialize nfs-server
-echo 'installing nfs-common...'
-sudo -u root apt install nfs-common -y -qq
 echo 'installing git...'
 sudo -u root apt-get install git -y 
 
@@ -18,7 +16,7 @@ else
         newgrp docker 
         exec su -l $USER
         docker run hello-world
-        docker image rm hello-world
+        docker image rm hello-worled
     else
         echo "Exiting installation."
         exit 0
