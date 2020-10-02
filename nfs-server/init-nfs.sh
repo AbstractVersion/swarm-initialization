@@ -15,9 +15,8 @@ else
     read -p "Do you want to install docker compose ? (y/n) " RESP
     if [ "$RESP" = "y" ]; then
         echo "Installing Docker for you."
-        git clone https://github.com/docker/docker-install.git
-        chmod +x docker-install/install.sh
-        sudo -u root docker-install/install.sh
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sh get-docker.sh
     else
         echo "Exiting installation."
         exit 0
