@@ -171,4 +171,4 @@ sudo mount /mnt/local-nfs/logstash-conf
 
 
 
-sudo -u root mount swarmNfs.server.io:/nginx-conf /nfs/micor-env/config/filebeat
+sudo -u root mount swarmNfs.server.io:/nginx-conf test
