@@ -5,9 +5,6 @@ sudo -u root apt install nfs-common -y -qq
 echo 'installing git...'
 sudo -u root apt-get install git -y 
 
-
-install
-
 echo 'Checking docker installation...'
 if [ "$(which docker)" ]; then
     echo "Docker found!"
