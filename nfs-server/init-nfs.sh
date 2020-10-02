@@ -3,7 +3,7 @@
 echo 'installing nfs-common...'
 sudo -u root apt install nfs-common -y -qq
 echo 'installing git...'
-sudo -u root apt-get install git -y -qq
+sudo -u root apt-get install git -y 
 
 
 install
@@ -12,11 +12,14 @@ echo 'Checking docker installation...'
 if [ "$(which docker)" ]; then
     echo "Docker found!"
 else
-    read -p "Do you want to install docker compose ? (y/n) " RESP
+    read -p "Do you want to install docker ? (y/n) " RESP
     if [ "$RESP" = "y" ]; then
         echo "Installing Docker for you."
         curl -fsSL https://get.docker.com -o get-docker.sh
         sh get-docker.sh
+        sudo -u root usermod -aG docker $USER
+        newgrp docker 
+        docker run hello-world
     else
         echo "Exiting installation."
         exit 0
