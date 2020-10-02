@@ -1,6 +1,8 @@
 #!/bin/sh
 # Swarm Worker Initialization
 echo 'Checking docker installation...'
+sudo -u root apt-get install curl -y -qq 
+
 if [ "$(which docker)" ]; then
     echo "Docker found!"
 else
