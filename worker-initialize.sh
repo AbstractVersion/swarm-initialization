@@ -1,46 +1,42 @@
 #!/bin/sh
 # Swarm Worker Initialization
 echo "---------------------------------- Docker Installation -------------------------------------------------"
+# Swarm Worker Initialization
+echo 'Checking docker installation...'
+sudo -u root apt-get install curl -y -qq 
 
-read -p "Do you want to install docker ? (y/n) " RESP
+if [ "$(which docker)" ]; then
+    echo "Docker found!"
+else
+    read -p "Do you want to install docker ? (y/n) " RESP
     if [ "$RESP" = "y" ]; then
-        sudo apt-get remove docker docker-engine docker.io containerd runc
-        sudo apt-get update
-        sudo apt-get install -y \
-            apt-transport-https \
-            ca-certificates \
-            curl \
-            gnupg-agent \
-            software-properties-common
-        curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-        sudo apt-key fingerprint 0EBFCD88
-        sudo add-apt-repository \
-        "deb [arch=amd64] https://download.docker.com/linux/debian \
-        $(lsb_release -cs) \
-        stable"
-        sudo apt-get update
-        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-        # sudo groupadd docker
-        sudo usermod -aG docker $USER
+        echo "Installing Docker for you."
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sh get-docker.sh
+        sudo -u root usermod -aG docker $USER
         newgrp docker 
-
-        #testing docker command
-        echo "testing docker command"
-        docker --versions
+        exec su -l $USER
         docker run hello-world
+        docker image rm hello-worled
     else
-        echo "proceeding with the installation."
+        echo "Exiting installation."
+        exit 0
     fi
-
-read -p "Do you want to install docker compose ? (y/n) " RESP
+fi
+if [ "$(which docker-compose)" ]; then
+    echo "docker-compose found!"
+else
+    read -p "Do you want to install docker compose ? (y/n) " RESP
     if [ "$RESP" = "y" ]; then
         sudo curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
         sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
         docker-compose --version
     else
-        echo "proceeding with the installation."
+        echo "Exiting installation."
+        exit 0
     fi
+fi
 
 
 echo "---------------------------------- Swarm Worker Initialization -------------------------------------------------"
@@ -49,15 +45,14 @@ echo "---------------------------------- Swarm Worker Initialization -----------
 echo "please run the command [ docker swarm join-token worker ] on your leader or a manager to retrieve the token the ip & the port\n"
 
 read -p "Please provide the swarn token & press enter: " swarm_token
-read -p "Please provide the swarn leader ip & press enter: " swarm_leader_ip
-read -p "Please provide the swarn api port & press enter: " swarm_leader_port
+read -p "Please provide the swarn leader ip & port in format ip:port and press enter: " swarmInfo
 
 echo '\n'
 
 echo "Registering node as worker on the swarm clustr, the node will be marked as host : "$HOSTNAME
 docker swarm join \
     --token $swarm_token \
-    $swarm_leader_ip:$swarm_leader_port
+    $swarmInfo
 
 echo "----------------- Inserting private image repository's certificate on trasted crts --------------------------- \n"
 echo "make sure you have the correct crt file placed in : docker-registry/nginx/ssl/private-registry-cert.crt  \n"   
@@ -92,23 +87,24 @@ if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
         fi
 fi
 
-snap install http
-# Now create a new directory for docker certificate and copy the Root CA certificate into it.
-sudo mkdir -p /etc/docker/certs.d/private.registry.io/
-sudo cp depentencies/certificate/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
+read -p "Do you want trust the registry certificate ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+    # Now create a new directory for docker certificate and copy the Root CA certificate into it.
+    sudo mkdir -p /etc/docker/certs.d/private.registry.io/
+    sudo cp depentencies/certificate/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
 
-# And then create a new directory '/usr/share/ca-certificate/extra' and copy the Root CA certificate into it.
-sudo mkdir -p /usr/share/ca-certificates/extra/
-sudo cp depentencies/certificate/private-registry-cert.crt /usr/share/ca-certificates/extra/
+    # And then create a new directory '/usr/share/ca-certificate/extra' and copy the Root CA certificate into it.
+    sudo mkdir -p /usr/share/ca-certificates/extra/
+    sudo cp depentencies/certificate/private-registry-cert.crt /usr/share/ca-certificates/extra/
 
-# Update certificates & restart docker
-sudo dpkg-reconfigure ca-certificates
-sudo systemctl restart docker
-
-
+    # Update certificates & restart docker
+    sudo dpkg-reconfigure ca-certificates
+    sudo systemctl restart docker
+else
+    echo "Ok then proceding."
+fi
 echo "testing repository..."
 
-read -p "Please provide the repository user the default credentials are {abstract:admin}:   " repo_user
 
 http -a $repo_user https://private.registry.io/v2/_catalog
 
@@ -145,30 +141,33 @@ fi
 
 
 
-# Install theese external tool for volume share among managers
-# Install Netshare Docker Volume Driver
-# Install Netshare which will provide the NFS Docker Volume Driver:
-wget https://github.com/ContainX/docker-volume-netshare/releases/download/v0.36/docker-volume-netshare_0.36_amd64.deb
-sudo -u root dpkg -i docker-volume-netshare_0.36_amd64.deb
-sudo -u root service docker-volume-netshare start
-sudo systemctl enable docker-volume-netshare
+read -p "Do you want install the thrid-party driver for the volume sharing ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+    # Install theese external tool for volume share among managers
+    # Install Netshare Docker Volume Driver
+    # Install Netshare which will provide the NFS Docker Volume Driver:
+    wget https://github.com/ContainX/docker-volume-netshare/releases/download/v0.36/docker-volume-netshare_0.36_amd64.deb
+    sudo -u root dpkg -i docker-volume-netshare_0.36_amd64.deb
+    sudo -u root service docker-volume-netshare start
+    sudo systemctl enable docker-volume-netshare
 
-echo 'testing nfs docker volume driver....'
-docker volume create --driver nfs --name test-nfs-volume -o share=$HOSTNAME:/filebeat
-docker volume inspect test-nfs-volume
-docker volume rm test-nfs-volume
+    echo 'testing nfs docker volume driver....'
+    docker volume create --driver nfs --name test-nfs-volume -o share=$HOSTNAME_NFS:/
+    docker volume inspect test-nfs-volume
+    docker volume rm test-nfs-volume
+else
+    echo "Ok then proceding."
+fi
+
+
 # docker run --rm -it  -v test-nfs-volume:/app/test-data private.registry.io/test-nfs:latest
 
-
-sudo mkdir -p /mnt/local-nfs/filebeat/
-# sudo mkdir -p /nfs/micor-env/config/logstash
-
-# On Workers
-echo 'swarmNfs.server.io:/filebeat-conf /mnt/local-nfs/filebeat/  nfs      defaults    0       0' >> /etc/fstab
-# sudo -u root mount 192.168.2.4:/filebeat-conf /nfs/micor-env/config/filebeat
-
-# sudo -u root mount -t nfs $HOSTNAME:/filebeat-conf /nfs/micor-env/config/filebeat
-sudo mount /mnt/local-nfs/filebeat/
-
-
+read -p "Do you want to mount the logstash-configuration directory from the nfs server ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+    sudo -u root chmod +x features/permenant-nfs-mount-worker.sh
+    sudo -u root features/permenant-nfs-mount-worker.sh
+    sudo -u root mount /mnt/local-nfs/filebeat/
+else
+    echo "Ok then proceding."
+fi
 

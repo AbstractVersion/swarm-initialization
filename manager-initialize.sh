@@ -167,8 +167,6 @@ if [ "$RESP" = "y" ]; then
     sudo -u root chmod +x features/permenant-nfs-mount-manager.sh
     sudo -u root features/permenant-nfs-mount-manager.sh
     sudo -u root mount /mnt/local-nfs/logstash-conf
-    ls -la /mnt/local-nfs/logstash-conf
 else
     echo "Ok then proceding."
 fi
-

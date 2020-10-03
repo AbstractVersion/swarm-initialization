@@ -36,7 +36,7 @@ else
     fi
 fi
 
-echo "---------------------------------- Swarm Worker Initialization -------------------------------------------------"
+echo "---------------------------------- Swarm Leader Initialization -------------------------------------------------"
 
 # Automatically get the ip address from eth0 interface.
 # ip="$(ifconfig | grep -A 1 'eth0' | tail -1 | cut -d ':' -f 2 | cut -d ' ' -f 1)"
