@@ -55,7 +55,9 @@ then
     exit 9999 # die with error code 9999
 fi
 
-sudo -u root chmod -R 0444  $CURR_DIR/mnt/local-nfs
+# sudo -u root chmod -R 0444  $CURR_DIR/mnt/local-nfs
+sudo -u root chmod -R go-w $CURR_DIR/mnt/local-nfs/logstash-conf/
+sudo -u root chmod -R go-w $CURR_DIR/mnt/local-nfs/filebeat-conf/filebeat.docker.yml 
 
 echo 'all set ! firing up nfs server !'
 docker-compose up -d
